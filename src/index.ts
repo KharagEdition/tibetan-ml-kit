@@ -22,9 +22,9 @@ app.get("/", (req, res) => {
 
 // POST endpoint
 app.post("/api/translate", async (req, res) => {
-  const input = req.body.query;
+  let input = req.body.query;
   const direction = req.body.direction;
-
+  input = input.replace(/\n/g, " ");
   if (typeof input !== "string") {
     return res
       .status(400)
@@ -66,9 +66,9 @@ app.post("/api/translate", async (req, res) => {
 
     // Collect stream data
     response.data.on("data", (chunk: any) => {
+      console.log("Response:" + chunk);
       const lines = chunk.toString().split("\n");
-      console.log("" + JSON.stringify(lines));
-      debugger;
+
       lines.forEach((line: any) => {
         if (line.trim().startsWith("data:")) {
           const json = JSON.parse(line.replace("data:", "").trim());
@@ -235,7 +235,7 @@ wss.on("connection", (ws) => {
         role: "user",
         parts: [
           {
-            text: "Hello, I am a Tibetan user, I might ask you question related to tibetan subject matter, I might use tibetan phrase as well. please keep in mind",
+            text: "Hello, I am a Tibetan user, I might ask you question related to tibetan subject matter, I might use tibetan phrase as well. please keep in mind, If I ask anything please make sure to response in english no other language including tibetan as well.",
           },
         ],
       },
@@ -253,24 +253,25 @@ wss.on("connection", (ws) => {
     displayChatsTokenCount(model, chat, msg);
 
     // stream message
-    /**
-    const result = await chat.sendMessageStream(msg);
 
-    for await (const chunk of result.stream) {
-      const chunkText = chunk.text();
-      ws.send(chunkText);
-    }
+    // const result = await chat.sendMessageStream(msg);
 
-    const response = await result.response;
-    ws.send(JSON.stringify(response));
-     */
+    // for await (const chunk of result.stream) {
+    //   const chunkText = chunk.text();
+    //   ws.send(chunkText);
+    // }
+
+    // const response = await result.response;
+    // ws.send(JSON.stringify(response));
 
     const result = await chat.sendMessage(msg);
     const response = result.response;
     if (response && response.candidates) {
       let en = response.candidates[0].content.parts[0].text;
+      console.log("input==>" + en);
 
       let tb = await getTbVersionResponse(en);
+      console.log("output==>" + tb);
       ws.send(
         JSON.stringify({
           en: en,
@@ -296,11 +297,13 @@ async function displayChatsTokenCount(model: any, chat: any, msg: string) {
   await displayTokensCount(model, { contents: [...history, msgContent] });
 }
 async function getTbVersionResponse(en: string | undefined) {
+  en = en?.replace(/\n/g, " ");
+
   try {
     // Create form data
     const formData = new FormData();
     formData.append("input", en ?? ""); // 'input' is the query
-    formData.append("direction", "en"); // 'direction' is set to 'en'
+    formData.append("direction", "bo"); // 'direction' is set to 'en'
 
     // Make a POST request to the stream API with custom headers
     const response = await axios({
@@ -327,34 +330,46 @@ async function getTbVersionResponse(en: string | undefined) {
       responseType: "stream",
     });
 
-    let finalData: TranslateResponse | null = null;
+    return new Promise((resolve, reject) => {
+      let finalData: TranslateResponse | null = null;
 
-    // Collect stream data
-    response.data.on("data", (chunk: any) => {
-      const lines = chunk.toString().split("\n");
-      lines.forEach((line: any) => {
-        if (line.trim().startsWith("data:")) {
-          const json = JSON.parse(line.replace("data:", "").trim());
-          if (json.token && json.token.special) {
-            finalData = json;
-          }
+      // Collect stream data
+      response.data.on("data", (chunk: any) => {
+        console.log("Response:" + chunk);
+        if (chunk.toString().includes("\n")) {
+          const lines = chunk.toString().split("\n");
+
+          lines.forEach((line: any) => {
+            if (line.trim().startsWith("data:")) {
+              const json = JSON.parse(line.replace("data:", "").trim());
+              if (json.token && json.token.special) {
+                finalData = json;
+              }
+            }
+          });
         }
       });
-    });
 
-    // Send the final data when the stream ends
-    response.data.on("end", () => {
-      if (finalData) {
-        return finalData;
-      } else {
-        return "failed while translating data";
-      }
-    });
+      // Resolve the final data when the stream ends
+      response.data.on("end", () => {
+        if (finalData) {
+          resolve(
+            finalData.message
+              ? finalData.message?.generated_text
+              : finalData.generated_text
+          );
+        } else {
+          resolve("failed while translating data");
+        }
+      });
 
-    response.data.on("error", (err: any) => {
-      console.error("Stream error:", err);
+      response.data.on("error", (err: any) => {
+        console.error("Stream error:", err);
+        reject(err);
+      });
     });
   } catch (error) {
     console.error("Error calling stream API:", error);
+    throw error;
   }
 }

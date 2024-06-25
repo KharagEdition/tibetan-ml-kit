@@ -14,6 +14,7 @@ export interface Token {
 export interface TranslateResponse {
   code: number;
   message: Message;
+  generated_text: string;
 }
 
 export interface Message {
