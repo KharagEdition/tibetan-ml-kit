@@ -63,14 +63,14 @@ class TibetanMlKit {
       if (response && response.candidates) {
         let en = response.candidates[0].content.parts[0].text;
 
-        let tb = await getTranslateSyncResponse({
+        let tb: any = await getTranslateSyncResponse({
           input: en ?? "",
           direction: "bo",
         });
         ws.send(
           JSON.stringify({
             en: en,
-            tb: tb,
+            tb: tb["generated_text"],
           })
         );
       }

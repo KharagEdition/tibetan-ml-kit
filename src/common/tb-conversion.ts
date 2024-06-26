@@ -64,11 +64,11 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
       // Resolve the final data when the stream ends
       response.data.on("end", () => {
         if (finalData) {
-          resolve(
-            finalData.message
+          resolve({
+            generated_text: finalData.message
               ? finalData.message?.generated_text
-              : finalData.generated_text
-          );
+              : finalData.generated_text,
+          });
         } else {
           resolve("failed while translating data");
         }
