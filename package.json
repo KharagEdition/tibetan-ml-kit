@@ -1,7 +1,7 @@
 {
-  "name": "tibetan-chatbot-interface",
+  "name": "tibetan-ml-kit",
   "version": "1.0.0",
-  "description": "Tibetan Chatbot Interface",
+  "description": "Tibetan ML Kit",
   "main": "index.ts",
   "scripts": {
     "test": "npm run test",
@@ -16,7 +16,9 @@
   "keywords": [
     "Tibetan",
     "kharagedition",
-    "tibetan-chatbot"
+    "tibetan-chatbot",
+    "tibetan-ml-kit",
+    "tibetan-translate"
   ],
   "author": "Kunchok Tashi",
   "license": "MIT",
