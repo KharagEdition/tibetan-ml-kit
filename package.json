@@ -2,13 +2,16 @@
   "name": "tibetan-ml-kit",
   "version": "1.0.0",
   "description": "Tibetan ML Kit",
-  "main": "index.ts",
+  "main": "dist/tibetan-ml-kit.js",
+  "types": "dist/tibetan-ml-kit.d.ts",
   "scripts": {
     "test": "npm run test",
     "build": "tsc",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts"
+    "prepublishOnly": "npm run build"
   },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/KharagEdition/tibetan-chatbot-interface.git"
