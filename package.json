@@ -1,6 +1,6 @@
 {
   "name": "tibetan-ml-kit",
-  "version": "1.0.0",
+  "version": "1.0.4",
   "description": "Tibetan ML Kit",
   "main": "dist/tibetan-ml-kit.js",
   "types": "dist/tibetan-ml-kit.d.ts",

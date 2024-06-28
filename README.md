@@ -1,165 +1,48 @@
-# tibetan-chatbot-interface
-Tibetan Chatbot interface
+# tibetan-ml-kit
 
-#Tibeta Chatbot interface Node.js Project
+Tibetan MLKt
 
-This is a simple Node.js project using TypeScript, containerized with Docker.
+# Tibetan MLKt for JavaScript
 
-## Prerequisites
+> [!CAUTION]
+> **Using Tibetan MLKit SDK for JavaScript directly from a client-side app is
+> recommended for prototyping only.** If you plan to enable billing, we strongly
+> recommend that you call the Google AI Gemini API only server-side to keep your
+> API key safe. You risk potentially exposing your API key to malicious actors
+> if you embed your API key directly in your JavaScript app or fetch it remotely
+> at runtime.
 
-- Node.js (>=14.x)
-- npm (comes with Node.js)
-- Docker
+The Tibetan MLKit SDK enables developers to use Google's state-of-the-art generative AI models (like Gemini) to build AI-powered features and applications. This SDK supports use cases like:
+- Generate text from text-only input
+- _(for Node.js)_ Embedding
 
-## Getting Started
+You can use this JavaScript SDK for applications built with Node.js or for web apps.
 
-### 1. Clone the Repository
+For example, with just a few lines of code, you can access Gemini's multimodal capabilities to generate text from text-and-image input.
 
-```sh
-git clone https://github.com/KharagEdition/tibetan-chatbot-interface
-cd tibetan-chatbot-interface
+**MLKit includes**
 
+1.  Online translation.\
+`git clone https://github.com/google/generative-ai-js`
 
+2.  Chat in Tibetan using Gemini model.
+3.  and more coming soon...
 
+To initate chat in Node.js:
+```js
+const server = http.createServer(app);
+const tibetanMlKit = new TibetanMlKit(server, {
+  apiKey: "API_KEY",
+  modelName: "gemini-1.5-flash-latest",
+});
+```
 
-my-typescript-nodejs-project/
-│
-├── src/
-│   └── index.ts
-│
-├── dist/
-│   └── index.js
-│
-├── node_modules/
-│
-├── .gitignore
-├── Dockerfile
-├── docker-compose.yml
-├── package.json
-├── package-lock.json
-└── tsconfig.json
-
-
-Creating new project ?
-## Getting Started
-
-1. **Create a New Project Directory**
-
-    ```sh
-    mkdir my-typescript-nodejs-project
-    cd my-typescript-nodejs-project
-    ```
-
-2. **Initialize a New Node.js Project**
-
-    ```sh
-    npm init -y
-    ```
-
-3. **Install TypeScript and Other Dependencies**
-
-    ```sh
-    npm install typescript ts-node @types/node @types/express --save-dev
-    npm install express
-    ```
-
-4. **Initialize TypeScript Configuration**
-
-    ```sh
-    npx tsc --init
-    ```
-
-5. **Create Source Directory and Entry File**
-
-    ```sh
-    mkdir src
-    touch src/index.ts
-    ```
-
-6. **Edit `src/index.ts` to Include a Basic Express Server Setup**
-
-    ```typescript
-    import express from 'express';
-
-    const app = express();
-    const port = 3000;
-
-    app.get('/', (req, res) => {
-      res.send('Hello World!');
+To transate in Node.js:
+```js
+ const data = await TibetanMlKit.translateWithSync({
+      input: "test",
+      direction: "bo",
     });
+    return res.json(data);
+```
 
-    app.listen(port, () => {
-      console.log(`Example app listening at http://localhost:${port}`);
-    });
-    ```
-
-7. **Update `tsconfig.json`**
-
-    Ensure your `tsconfig.json` includes the following configuration to specify the output directory and the module resolution strategy:
-
-    ```json
-    {
-      "compilerOptions": {
-        "target": "ES6",
-        "module": "commonjs",
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
-      },
-      "include": ["src"],
-      "exclude": ["node_modules"]
-    }
-    ```
-
-8. **Add Scripts to `package.json`**
-
-    Add the following scripts to your `package.json` file to build and start your application:
-
-    ```json
-    {
-      "name": "my-typescript-nodejs-project",
-      "version": "1.0.0",
-      "description": "",
-      "main": "dist/index.js",
-      "scripts": {
-        "build": "tsc",
-        "start": "node dist/index.js",
-        "dev": "ts-node src/index.ts"
-      },
-      "keywords": [],
-      "author": "",
-      "license": "ISC",
-      "dependencies": {
-        "express": "^4.17.1"
-      },
-      "devDependencies": {
-        "@types/express": "^4.17.11",
-        "@types/node": "^14.14.37",
-        "ts-node": "^9.1.1",
-        "typescript": "^4.2.3"
-      }
-    }
-    ```
-
-9. **Build and Run Your Project**
-
-    - Build your project using the TypeScript compiler:
-
-      ```sh
-      npm run build
-      ```
-
-    - Run your project using Node.js:
-
-      ```sh
-      npm start
-      ```
-
-    - For development, you can use `ts-node` to directly run TypeScript files without needing to build them first:
-
-      ```sh
-      npm run dev
-      ```

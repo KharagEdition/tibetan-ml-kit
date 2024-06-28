@@ -1,15 +1,15 @@
 import axios from "axios";
 import { DataParam } from "./common/data-param";
 import { getTranslateSyncResponse } from "./common/tb-conversion";
-import { Server, WebSocketServer } from "ws";
-import { defaultPromtMessage, genAI } from "./constant";
+import { WebSocketServer } from "ws";
+import { defaultPromtMessage } from "./constant";
 import { ModelConfig } from "./common/model-config";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // You can use a class if you prefer
 class TibetanMlKit {
   wss: WebSocketServer;
-
+  modelConfig: ModelConfig;
   /**
    *
    * @param server
@@ -17,12 +17,14 @@ class TibetanMlKit {
    */
   constructor(server: any, modelConfig: ModelConfig) {
     this.wss = new WebSocketServer({ server });
-
+    this.modelConfig = modelConfig;
+  }
+  initConnection() {
     /**
      * Initaite the websocket server
      */
     this.wss.on("connection", (ws) => {
-      this.handleConnection(ws, modelConfig);
+      this.handleConnection(ws, this.modelConfig);
     });
   }
 
