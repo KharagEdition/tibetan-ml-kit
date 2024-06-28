@@ -7,7 +7,7 @@ import { DataParam } from "./data-param";
  * @param dataParam
  * @returns translate response sync
  */
-export async function getTranslateSyncResponse(dataParam: DataParam) {
+async function getTranslateSyncResponse(dataParam: DataParam) {
   dataParam.input = dataParam.input?.replace(/\n/g, " ");
 
   try {
@@ -17,7 +17,7 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
     formData.append("direction", dataParam.direction ?? "en"); // 'direction' is set to 'en'
 
     // Make a POST request to the stream API with custom headers
-    const response = await axios({
+    const translateResponse = await axios({
       method: "post",
       url: "https://monlam-file-api-latest.onrender.com/mt/playground/stream",
       data: formData,
@@ -45,7 +45,7 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
       let finalData: TranslateResponse | null = null;
 
       // Collect stream data
-      response.data.on("data", (chunk: any) => {
+      translateResponse.data.on("data", (chunk: any) => {
         console.log("Response:" + chunk);
         if (chunk.toString().includes("\n")) {
           const lines = chunk.toString().split("\n");
@@ -62,7 +62,7 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
       });
 
       // Resolve the final data when the stream ends
-      response.data.on("end", () => {
+      translateResponse.data.on("end", () => {
         if (finalData) {
           resolve({
             generated_text: finalData.message
@@ -74,7 +74,7 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
         }
       });
 
-      response.data.on("error", (err: any) => {
+      translateResponse.data.on("error", (err: any) => {
         console.error("Stream error:", err);
         reject(err);
       });
@@ -84,3 +84,5 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
     throw error;
   }
 }
+
+export { getTranslateSyncResponse };

@@ -1,13 +1,14 @@
 {
   "name": "tibetan-ml-kit",
-  "version": "1.0.4",
+  "version": "0.0.4-dev",
   "description": "Tibetan ML Kit",
   "main": "dist/tibetan-ml-kit.js",
   "types": "dist/tibetan-ml-kit.d.ts",
   "scripts": {
     "test": "npm run test",
     "build": "tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "dev": "ts-node src/index.ts"
   },
   "files": [
     "dist"
