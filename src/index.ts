@@ -3,8 +3,10 @@ import express from "express";
 const bodyParser = require("body-parser");
 import http from "http";
 import { TibetanMlKit } from "./tibetan-ml-kit";
+import cors from "cors";
 
 const app = express();
+app.use(cors());
 const server = http.createServer(app);
 const tibetanMlKit = new TibetanMlKit(server, {
   apiKey: process.env.API_KEY ?? "",
