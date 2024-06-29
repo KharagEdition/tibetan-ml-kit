@@ -62,6 +62,7 @@ class TibetanMlKit {
       const response = result.response;
       if (response && response.candidates) {
         let en = response.candidates[0].content.parts[0].text;
+        console.log("en===>", en);
 
         let tb: any = await getTranslateSyncResponse({
           input: en ?? "",
