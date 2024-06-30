@@ -6,12 +6,32 @@ import { TibetanMlKit } from "./tibetan-ml-kit";
 import cors from "cors";
 
 const app = express();
-
+/**
+ * Cors
+ */
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
+  // Define the allowed origins
+  const allowedOrigins = [
+    "http://kharagedition.com",
+    "https://kharagedition.web.app",
+  ];
+
+  if (req.headers.origin) {
+    // Check if the request origin is in the allowed origins array
+    if (allowedOrigins.includes(req.headers.origin)) {
+      res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
+    }
+
+    // Set allowed methods and headers
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+
+    // Continue to the next middleware or route handler
+    next();
+  }
 });
 
 app.use(cors());
@@ -44,6 +64,9 @@ app.get("/api/translate", async (req, res) => {
   }
 });
 
+/**
+ * Listen to port
+ */
 server.listen(port, () => {
   console.log("Server is listening on port 3000");
 });
