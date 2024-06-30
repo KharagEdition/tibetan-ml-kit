@@ -47,7 +47,11 @@ class TibetanMlKit {
         },
         {
           role: "model",
-          parts: [{ text: "Great to meet you. What would you like to know?" }],
+          parts: [{ text: "Sure things. What would you like to know?" }],
+        },
+        {
+          role: "user",
+          parts: [{ text: "Tashi Delek" }],
         },
       ],
       generationConfig: { maxOutputTokens: 100 },
