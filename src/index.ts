@@ -12,7 +12,7 @@ const app = express();
 app.use((req, res, next) => {
   // Define the allowed origins
   const allowedOrigins = [
-    "http://kharagedition.com",
+    "https://kharagedition.com",
     "https://kharagedition.web.app",
   ];
 
