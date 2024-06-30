@@ -9,32 +9,27 @@ const app = express();
 /**
  * Cors
  */
-app.use((req, res, next) => {
-  // Define the allowed origins
-  const allowedOrigins = [
-    "https://kharagedition.com",
-    "https://kharagedition.web.app",
-  ];
+// Define allowed origins (replace with your trusted domains)
+const allowedOrigins = [
+  "https://kharagedition.com",
+  "https://kharagedition.web.app",
+];
 
-  if (req.headers.origin) {
-    // Check if the request origin is in the allowed origins array
-    if (allowedOrigins.includes(req.headers.origin)) {
-      res.setHeader("Access-Control-Allow-Origin", req.headers.origin);
+// CORS configuration
+const corsOptions = {
+  origin: function (origin: any, callback: any) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
     }
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
 
-    // Set allowed methods and headers
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization"
-    );
-
-    // Continue to the next middleware or route handler
-    next();
-  }
-});
-
-app.use(cors());
+// Enable CORS with options
+app.use(cors(corsOptions));
 const server = http.createServer(app);
 const tibetanMlKit = new TibetanMlKit(server, {
   apiKey: process.env.API_KEY ?? "",
