@@ -15,28 +15,34 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
     const formData = new FormData();
     formData.append("input", dataParam.input ?? ""); // 'input' is the query
     formData.append("direction", dataParam.direction ?? "en"); // 'direction' is set to 'en'
+    if (!dataParam.input.endsWith(".")) {
+      dataParam.input = dataParam.input + ".";
+    }
 
-    // Make a POST request to the stream API with custom headers
+    const url = `https://monlam.ai/api/translation/stream?text=${encodeURIComponent(
+      dataParam.input
+    )}&target=${dataParam.direction}&token=${dataParam.csrfToken}`;
+
+    // Make a GET request to the stream API with custom headers
     const response = await axios({
-      method: "post",
-      url: "https://monlam-file-api-latest.onrender.com/mt/playground/stream",
-      data: formData,
+      method: "get",
+      url: url,
       headers: {
-        Accept: "*/*",
+        Accept: "text/event-stream",
         "Accept-Encoding": "gzip, deflate, br, zstd",
         "Accept-Language": "en-US,en;q=0.9",
-        Origin: "https://monlam.ai",
-        Referer: "https://monlam.ai/",
-        "Sec-Ch-Ua":
-          '"Brave";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
-        "Sec-Ch-Ua-Mobile": "?1",
-        "Sec-Ch-Ua-Platform": '"Android"',
+        "Cache-Control": "no-cache",
+        Cookie: dataParam.cookie,
+        Referer: "https://monlam.ai/model/mt?source=en",
+        "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Brave";v="126"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "cross-site",
+        "Sec-Fetch-Site": "same-origin",
         "Sec-Gpc": "1",
         "User-Agent":
-          "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
       },
       responseType: "stream",
     });
@@ -53,7 +59,7 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
           lines.forEach((line: any) => {
             if (line.trim().startsWith("data:")) {
               const json = JSON.parse(line.replace("data:", "").trim());
-              if (json.token && json.token.special) {
+              if (json.token.special) {
                 finalData = json;
               }
             }
@@ -81,6 +87,44 @@ export async function getTranslateSyncResponse(dataParam: DataParam) {
     });
   } catch (error) {
     console.error("Error calling stream API:", error);
+    throw error;
+  }
+}
+
+export async function fetchCsrfToken() {
+  try {
+    const response = await axios({
+      method: "get",
+      url: "https://monlam.ai/model/mt",
+      params: {
+        source: "en",
+        _data: "root",
+      },
+      headers: {
+        Accept: "*/*",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "en-US,en;q=0.9",
+        Referer: "https://monlam.ai/model/mt?source=fr",
+        "Sec-Ch-Ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Brave";v="126"',
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": '"Windows"',
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
+        "Sec-Gpc": "1",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      },
+    });
+    const csrfToken = response.data.csrfToken;
+    const setCookie = response.headers["set-cookie"];
+
+    // Extract the first Set-Cookie value
+    const firstSetCookie = setCookie ? setCookie[0].split(";")[0] : null;
+
+    return { csrfToken, cookie: firstSetCookie };
+  } catch (error) {
+    console.error("Error fetching CSRF token:", error);
     throw error;
   }
 }

@@ -8,4 +8,14 @@ export interface DataParam {
    *  from bo to en and passing bo translate from en to bo.
    */
   direction?: "en" | "bo";
+
+  /**
+   * The token to be used for the translation.
+   */
+  csrfToken: string;
+
+  /**
+   * The cookie to be used for the translation.
+   */
+  cookie: string;
 }

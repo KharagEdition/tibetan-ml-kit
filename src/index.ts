@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 import http from "http";
 import { TibetanMlKit } from "./tibetan-ml-kit";
 import cors from "cors";
+import { fetchCsrfToken } from "./common/tb-conversion";
 
 const app = express();
 /**
@@ -47,15 +48,29 @@ app.get("/", (req, res) => {
 /**
  * Translates API
  */
-app.get("/api/translate", async (req, res) => {
+app.post("/api/translate", async (req, res) => {
   try {
     const data = await TibetanMlKit.translateWithSync({
-      input: "test",
+      input: "working now",
       direction: "bo",
+      cookie: req.body.cookie,
+      csrfToken: req.body.csrfToken,
     });
     return res.json(data);
   } catch (error) {
-    return res.status(500).send("Error calling API");
+    return res.status(500).send({ error: "error while translating data" });
+  }
+});
+
+app.get("/api/token", async (req, res) => {
+  try {
+    const { csrfToken, cookie } = await fetchCsrfToken();
+    return res.json({
+      csrfToken,
+      cookie,
+    });
+  } catch (error) {
+    return res.status(500).send({ error: "error while fetching token" });
   }
 });
 

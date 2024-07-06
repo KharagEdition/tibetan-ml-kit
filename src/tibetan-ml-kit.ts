@@ -1,6 +1,9 @@
 import axios from "axios";
 import { DataParam } from "./common/data-param";
-import { getTranslateSyncResponse } from "./common/tb-conversion";
+import {
+  fetchCsrfToken,
+  getTranslateSyncResponse,
+} from "./common/tb-conversion";
 import { Server, WebSocketServer } from "ws";
 import { defaultPromtMessage, genAI } from "./constant";
 import { ModelConfig } from "./common/model-config";
@@ -67,10 +70,13 @@ class TibetanMlKit {
       if (response && response.candidates) {
         let en = response.candidates[0].content.parts[0].text;
         console.log("en===>", en);
+        const { csrfToken, cookie } = await fetchCsrfToken();
 
         let tb: any = await getTranslateSyncResponse({
           input: en ?? "",
           direction: "bo",
+          cookie: cookie ?? "",
+          csrfToken: csrfToken,
         });
         ws.send(
           JSON.stringify({
@@ -158,8 +164,18 @@ class TibetanMlKit {
    * @param DataParam
    * @returns translateWithSync
    */
-  static async translateWithSync({ input, direction = "en" }: DataParam) {
-    return await getTranslateSyncResponse({ input, direction });
+  static async translateWithSync({
+    input,
+    direction = "en",
+    csrfToken,
+    cookie,
+  }: DataParam) {
+    return await getTranslateSyncResponse({
+      input,
+      direction,
+      csrfToken,
+      cookie,
+    });
   }
 
   /**
